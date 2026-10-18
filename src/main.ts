@@ -17,7 +17,7 @@ console.log('--- Каталог ---');
 productsModel.setItems(apiProducts.items);
 console.log('Массив товаров из каталога:', productsModel.getItems()); 
 
-// Берем первый товар с ненулевой ценой
+// Берем первый товар с указанной ценой
 const testProduct = apiProducts.items.find(
   (product) => product.price !== null
 );
@@ -222,7 +222,7 @@ console.log(
 );
 
 // Работы по 8му спринту
-console.log('-- Проверки API для 8го спринта --')
+console.log('-- Проверки API для 8го спринта --');
 const api = new Api(API_URL); 
 const apiMethods = new ApiMethods(api);
 
