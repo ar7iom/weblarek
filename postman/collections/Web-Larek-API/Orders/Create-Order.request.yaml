@@ -1,0 +1,23 @@
+$kind: http-request
+name: Create Order
+method: POST
+url: '{{baseUrl}}/order'
+description: 'Places a new order. Returns the order ID and total amount.'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "payment": "online",
+      "email": "user@example.com",
+      "phone": "+79999999999",
+      "address": "ул. Пушкина, д. 1",
+      "total": 4700,
+      "items": [
+        "854cef69-976d-4c2a-a18c-2aa45046c390",
+        "c101ab44-ed99-4a54-990d-47aa2bb4e7d9"
+      ]
+    }

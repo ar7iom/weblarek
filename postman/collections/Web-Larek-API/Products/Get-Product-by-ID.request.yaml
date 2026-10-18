@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Product by ID
+method: GET
+url: '{{baseUrl}}/product/{{productId}}'
+description: Returns a single product by its ID.
+order: 2000
+pathVariables:
+  - key: productId
+    value: '854cef69-976d-4c2a-a18c-2aa45046c390'
