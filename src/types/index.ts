@@ -24,3 +24,22 @@ export interface IBuyer {
   phone: string;
   address: string;
 }
+
+// Ответ сервера при получении каталога.
+export interface IProductsResponse {
+  total: number;
+  items: IProduct[];
+}
+
+// Данные для отправки заказа
+export interface IOrder extends Omit<IBuyer, 'payment'> {
+  payment: Exclude<TPayment, ''>; // Исключаем пустые методы оплаты, метод должен быть выбран
+  total: number;
+  items: IProduct['id'][]; // Идентификаторы товаров
+}
+
+// Ответ сервера после успешного оформления заказа
+export interface IOrderResult {
+  id: string;
+  total: number;
+}

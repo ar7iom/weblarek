@@ -3,12 +3,16 @@ import { apiProducts } from './utils/data';
 import { Products } from './components/Products';
 import { Cart } from './components/Cart';
 import { Buyer } from './components/Buyer';
+import { Api } from './components/base/Api';
+import { ApiMethods } from './components/ApiMethods';
+import { API_URL } from './utils/constants';
 
 const productsModel = new Products(); // Каталог
 const cartModel = new Cart(); // Корзина
 const buyerModel = new Buyer(); // Покупатель
 
 // Проверка вывода каталога
+console.log('-- Локальное тестирование --');
 console.log('--- Каталог ---');
 productsModel.setItems(apiProducts.items);
 console.log('Массив товаров из каталога:', productsModel.getItems()); 
@@ -154,7 +158,7 @@ console.log(
 
 buyerModel.setData({
   payment: 'card',
-  address: 'Тестовая улица, дом 1'
+  address: 'Spb Vosstania 1'
 });
 
 console.log(
@@ -170,8 +174,8 @@ console.log(
 // Имитируем второй этап: вводим остальные данные
 
 buyerModel.setData({
-  email: 'test@test.com',
-  phone: '+7 999 999 99 99'
+  email: 'test@test.ru',
+  phone: '+7 123 456 78 90'
 });
 
 console.log(
@@ -216,3 +220,30 @@ console.log(
   'После очистки снова ожидаем 4 ошибки:',
   buyerModel.validate()
 );
+
+// Работы по 8му спринту
+console.log('-- Проверки API для 8го спринта --')
+const api = new Api(API_URL); 
+const apiMethods = new ApiMethods(api);
+
+apiMethods.getProducts() // Запрашиваем товары с сервера
+  .then((response) => {
+      productsModel.setItems(response.items);
+      //Проверки
+      console.log(
+        'Каталог с сервера, сохранённый в модели:',
+        [...productsModel.getItems()]
+      );
+      console.log(
+        'Количество товаров в ответе сервера:',
+        response.total
+      );
+
+      console.log(
+        'Количество товаров в модели:',
+        productsModel.getItems().length
+      );
+      }
+  ).catch((error: unknown) => {
+    console.error('Не удалось загрузить каталог:', error); // Ошибка сервера или сети
+  });
