@@ -116,7 +116,7 @@ interface IProduct {
 
 #### Покупатель:
 ```
-interface IBuyer {
+export interface IBuyer {
   payment: TPayment;
   email: string;
   phone: string;
