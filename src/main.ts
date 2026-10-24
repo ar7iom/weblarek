@@ -21,11 +21,17 @@ console.log('Массив товаров из каталога:', productsModel.
 const testProduct = apiProducts.items.find(
   (product) => product.price !== null
 );
+// Добавляем еще один тестовый продукт для проверки корзины
+const anotherTestProduct = apiProducts.items.find(
+  (product) => product.price !== null && product.id !== testProduct?.id
+);
 
-if (testProduct) {
+if (testProduct && anotherTestProduct) {
   console.log(
     'Тестовый товар:',
-    productsModel.getProduct(testProduct.id)
+    productsModel.getProduct(testProduct.id),
+    '\nВторой тестовый товар:',
+    productsModel.getProduct(anotherTestProduct.id)
   );
 
   // Иммитируем выбор товара
@@ -66,53 +72,56 @@ console.log(
   cartModel.getTotal()
 );
 
-if (testProduct) {
+if (testProduct && anotherTestProduct) {
 
   cartModel.addItem(testProduct); // Кладём тестовый товар в корзину
-
+  
+  cartModel.addItem(anotherTestProduct); // Кладём ещё один тестовый товар в корзину
+  
   console.log(
     'Товары после добавления в корзину:',
     [...cartModel.getItems()] // [...] создаёт копию массива для вывода в консоль
   );
 
   console.log(
-    'Количество товаров после добавления в корзину, ожидаем 1:',
+    'Количество товаров после добавления в корзину, ожидаем 2:',
     cartModel.getCount()
   );
 
   console.log(
-    'Итого, сумма должна равняться цене товара:',
+    'Итого, сумма должна равняться сумме цен товаров:',
     cartModel.getTotal(),
-    'Цена товара:',
-    testProduct.price
+    '\nЦена тестового товара:',
+    testProduct.price,
+    '\nЦена второго тестового товара:',
+    anotherTestProduct.price
   );
 
   console.log(
-    'Товар есть в корзине, ожидаем true:',
+    'Товары есть в корзине, ожидаем true:',
     cartModel.hasItem(testProduct.id)
   );
 
   cartModel.addItem(testProduct); // Пробуем добавить тот же товар повторно
 
   console.log(
-    'Результат после повторного добавления, ожидаем 1:',
+    'Результат после повторного добавления, ожидаем 2:',
     cartModel.getCount()
   );
 
-  cartModel.removeItem(testProduct);   // Удаляем товар
+  cartModel.removeItem(anotherTestProduct);   // Удаляем товар
 
   console.log(
     'После удаления, ожидаем false:',
-    cartModel.hasItem(testProduct.id)
+    cartModel.hasItem(anotherTestProduct.id)
   );
 
   console.log(
-    'Количество после удаления, ожидаем 0:',
+    'Количество после удаления, ожидаем 1:',
     cartModel.getCount()
   );
 
-  // Добавляем снова, чтобы проверить очистку непустой корзины
-  cartModel.addItem(testProduct);
+  // Очищаем корзину полностью
   cartModel.clear();
 
   console.log(

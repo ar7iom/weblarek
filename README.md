@@ -114,16 +114,38 @@ Presenter - презентер содержит основную логику п
 В приложении используются две сущности, которые описывают данные, — товар и покупатель. Их можно описать такими интерфейсами:
 #### Товар:
 ```
-interface IProduct { id: string; description: string; image: string; title: string; category: string; price: number | null;
+interface IProduct { 
+  id: string; 
+  description: string; 
+  image: string; 
+  title: string; 
+  category: string; 
+  price: number | null;
 }
 ```
+
+Где:
+- id - уникальный идентификатор товара;
+- description - описание товара;
+- image - изображение товара;
+- title - наименование товара;
+- category - категория товара (заголовок таксономии);
+- price - цена товара.
 
 #### Покупатель:
 ```
-export interface IBuyer { payment: TPayment; email: string; phone: string; address: string;
+export interface IBuyer { 
+  payment: TPayment; 
+  email: string; 
+  phone: string; 
+  address: string;
 }
 ```
-
+Где:
+- payment - способ оплаты (см. ["Дополнительные типы"](#дополнительные-типы));
+- email - адрес эелектронной почты покупателя;
+- phone - контактный телефон покупателя;
+- address - адрес покупателя (используется как платежный и адрес доставки).
 ### Дополнительные типы
 
 ```ts
