@@ -21,7 +21,7 @@ console.log('Массив товаров из каталога:', productsModel.
 const testProduct = apiProducts.items.find(
   (product) => product.price !== null
 );
-// Добавляем еще один тестовый продукт для проверки корзины
+// Берём еще один тестовый продукт для проверки корзины
 const anotherTestProduct = apiProducts.items.find(
   (product) => product.price !== null && product.id !== testProduct?.id
 );
@@ -98,8 +98,9 @@ if (testProduct && anotherTestProduct) {
   );
 
   console.log(
-    'Товары есть в корзине, ожидаем true:',
-    cartModel.hasItem(testProduct.id)
+    'Оба товара есть в корзине, ожидаем true:',
+  cartModel.hasItem(testProduct.id)
+    && cartModel.hasItem(anotherTestProduct.id)
   );
 
   cartModel.addItem(testProduct); // Пробуем добавить тот же товар повторно
