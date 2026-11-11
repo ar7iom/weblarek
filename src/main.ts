@@ -6,6 +6,12 @@ import { Buyer } from './components/Buyer';
 import { Api } from './components/base/Api';
 import { ApiMethods } from './components/ApiMethods';
 import { API_URL } from './utils/constants';
+import { EventEmitter } from './components/base/Events';
+
+import { Header } from './components/view/Header';
+// import { Gallery } from './components/view/Gallery';
+// import { Card } from './components/view/Card';
+// import { CardCatalog } from './components/view/CardCatalog';
 
 const productsModel = new Products(); // Каталог
 const cartModel = new Cart(); // Корзина
@@ -257,3 +263,24 @@ apiMethods.getProducts() // Запрашиваем товары с сервер�
   ).catch((error: unknown) => {
     console.error('Не удалось загрузить каталог:', error); // Ошибка сервера или сети
   });
+
+  // Проверяем шапку
+
+  const headerContainer = document.querySelector<HTMLElement>('.header');
+
+if (!headerContainer) {
+  throw new Error('Не найден элемент .header');
+}
+const events = new EventEmitter();
+const header = new Header(headerContainer, events);
+
+events.on('basket:open', () => {
+  console.log('Запрошено открытие корзины');
+});
+
+header.render({ counter: 3 });
+
+console.assert(
+  header.render() === headerContainer,
+  'render() должен возвращать корневой элемент шапки'
+);

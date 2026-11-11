@@ -43,3 +43,68 @@ export interface IOrderResult {
   id: string;
   total: number;
 }
+
+// Типы данных представления
+
+// Данные шапки
+export interface HeaderData {
+  counter: number;
+}
+
+// Данные галереи
+export interface GalleryData {
+  catalog: HTMLElement[];
+}
+
+// Данные базовой карточки
+export type CardData = Pick<IProduct, 'title' | 'price'>;
+
+// Данные карточки каталога
+export type CardCatalogData =
+  CardData & Pick<IProduct, 'image' | 'category'>;
+
+// Данные подробной карточки
+export type CardPreviewData =
+  CardData & Pick<IProduct, 'image' | 'category' | 'description'> & {
+    buttonText: string;
+    buttonDisabled: boolean;
+  };
+
+// Данные карточки корзины   
+export type CardBasketData = CardData & {
+  index: number;
+};
+
+// Данные корзины
+export interface BasketData {
+  items: HTMLElement[];
+  total: number;
+  buttonDisabled: boolean;
+}
+
+// Данные модального окна
+export interface ModalData {
+  content: HTMLElement;
+}
+
+// Общие данные форм
+export interface FormData {
+  valid: boolean;
+  errors: string;
+}
+
+// Данные формы оплаты и доставки
+export type OrderFormData =
+  FormData & Pick<IBuyer, 'payment' | 'address'>;
+
+// Данные формы контактов   
+export type ContactsFormData =
+  FormData & Pick<IBuyer, 'email' | 'phone'>;
+
+// Данные подтверждения заказа
+export type SuccessData = Pick<IOrderResult, 'total'>;
+
+// Передача событий
+export interface CardActions {
+  onClick: () => void;
+}
