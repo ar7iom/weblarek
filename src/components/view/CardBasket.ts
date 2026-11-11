@@ -18,6 +18,6 @@ export class CardBasket extends Card<CardBasketData> {
   }
 
   set index(value: number) {
-    this.indexElement.textContent = `${value}`;
+    this.indexElement.textContent = String(value);
   }
 }

@@ -77,7 +77,7 @@ export type CardBasketData = CardData & {
 
 // Данные корзины
 export interface BasketData {
-  items: HTMLElement[];
+  list: HTMLElement[];
   total: number;
   buttonDisabled: boolean;
 }

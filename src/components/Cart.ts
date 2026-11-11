@@ -24,7 +24,7 @@ export class Cart {
     }
 
     this.items.push(product); // Добавляем товар в конец массива
-    this.events.emit('cart:changed'); // Сообщаем об изменении корзины
+    this.events.emit('cart:update'); // Сообщаем об изменении корзины
   }
 
   removeItem(product: IProduct): void { // Удаляем товар из корзины
@@ -36,7 +36,7 @@ export class Cart {
       (item) => item.id !== product.id
     );
 
-    this.events.emit('cart:changed'); // Сообщаем об изменении корзины
+    this.events.emit('cart:update'); // Сообщаем об изменении корзины
   }
 
   clear(): void { // Очищаем корзину, заменяя массив пустым
@@ -45,7 +45,7 @@ export class Cart {
     }
 
     this.items = [];
-    this.events.emit('cart:changed'); // Сообщаем об изменении корзины
+    this.events.emit('cart:update'); // Сообщаем об изменении корзины
   }
 
   getTotal(): number { // Возвращаем сумму товаров в корзине
