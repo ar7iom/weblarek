@@ -1,3 +1,4 @@
+import type { IEvents } from './base/Events'; // подключаем брокер событий из src/components/base/Events.ts
 import type {
   IBuyer,
   TPayment,
@@ -9,6 +10,11 @@ export class Buyer { // Изначально данные пустые
   protected address: string = '';
   protected email: string = '';
   protected phone: string = '';
+  protected events: IEvents; // events — события 
+
+  constructor(events: IEvents) {
+    this.events = events;
+  }
 
   setData(data: Partial<IBuyer>): void { // Сохраняем только переданные данные
 
@@ -27,6 +33,8 @@ export class Buyer { // Изначально данные пустые
     if (data.phone !== undefined) {
       this.phone = data.phone;
     }
+
+    this.events.emit('buyer:update');
   }
 
   getData(): IBuyer { // Создаём новый объект и кладём туда данные покупателя
@@ -44,6 +52,8 @@ export class Buyer { // Изначально данные пустые
     this.address = '';
     this.email = '';
     this.phone = '';
+
+    this.events.emit('buyer:update');
   }
 
   validate(): BuyerErrors { // Валидация данных

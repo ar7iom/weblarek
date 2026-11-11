@@ -1,5 +1,6 @@
 import './scss/styles.scss';
 import { apiProducts } from './utils/data';
+import { cloneTemplate } from './utils/utils';
 import { Products } from './components/Products';
 import { Cart } from './components/Cart';
 import { Buyer } from './components/Buyer';
@@ -9,278 +10,41 @@ import { API_URL } from './utils/constants';
 import { EventEmitter } from './components/base/Events';
 
 import { Header } from './components/view/Header';
-// import { Gallery } from './components/view/Gallery';
-// import { Card } from './components/view/Card';
-// import { CardCatalog } from './components/view/CardCatalog';
+import { Gallery } from './components/view/Gallery';
+import { CardCatalog } from './components/view/CardCatalog';
+import { Modal } from './components/view/Modal';
+import { CardPreview } from './components/view/CardPreview';
+import { CardBasket } from './components/view/CardBasket';
+import { Basket } from './components/view/Basket';
+import { OrderForm } from './components/view/OrderForm';
+import { ContactsForm } from './components/view/ContactsForm';
+import { Success } from './components/view/Success';
 
-const productsModel = new Products(); // Каталог
-const cartModel = new Cart(); // Корзина
-const buyerModel = new Buyer(); // Покупатель
+const events = new EventEmitter();
 
-// Проверка вывода каталога
-console.log('-- Локальное тестирование --');
-console.log('--- Каталог ---');
-productsModel.setItems(apiProducts.items);
-console.log('Массив товаров из каталога:', productsModel.getItems()); 
+const productsModel = new Products(events); // Каталог
+const cartModel = new Cart(events); // Корзина
+const buyerModel = new Buyer(events); // Покупатель
 
-// Берем первый товар с указанной ценой
-const testProduct = apiProducts.items.find(
-  (product) => product.price !== null
-);
-// Берём еще один тестовый продукт для проверки корзины
-const anotherTestProduct = apiProducts.items.find(
-  (product) => product.price !== null && product.id !== testProduct?.id
+const gallery = new Gallery(
+  document.querySelector<HTMLElement>('.gallery')!
 );
 
-if (testProduct && anotherTestProduct) {
-  console.log(
-    'Тестовый товар:',
-    productsModel.getProduct(testProduct.id),
-    '\nВторой тестовый товар:',
-    productsModel.getProduct(anotherTestProduct.id)
-  );
+events.on('products:update', () => {
+  const products = productsModel.getItems();
 
-  // Иммитируем выбор товара
-  productsModel.setPreview(testProduct);
-  
-  // Выводим выбранный товар в консоль
-  console.log(
-    'Выбранный товар:',
-    productsModel.getPreview()
-  );
-
-  // Сбрасываем выбор
-  productsModel.setPreview(null);
-
-  console.log(
-    'Каталог после сброса (ожидаем null):',
-    productsModel.getPreview()
-  );
-}
-
-// Проверяем случай, когда товара с таким id нет
-console.log(
-  'Поиск отсутствующего товара, ожидаем undefined:',
-  productsModel.getProduct('unknown-id')
-);
-
-// Проверяем корзину
-console.log('--- Корзина ---');
-cartModel.clear(); // Очищаем корзину
-
-console.log(
-  'Пустая корзина, ожидаем 0:',
-  cartModel.getCount()
-);
-
-console.log(
-  'Сумма пустой корзины, ожидаем 0:',
-  cartModel.getTotal()
-);
-
-if (testProduct && anotherTestProduct) {
-
-  cartModel.addItem(testProduct); // Кладём тестовый товар в корзину
-  
-  cartModel.addItem(anotherTestProduct); // Кладём ещё один тестовый товар в корзину
-  
-  console.log(
-    'Товары после добавления в корзину:',
-    [...cartModel.getItems()] // [...] создаёт копию массива для вывода в консоль
-  );
-
-  console.log(
-    'Количество товаров после добавления в корзину, ожидаем 2:',
-    cartModel.getCount()
-  );
-
-  console.log(
-    'Итого, сумма должна равняться сумме цен товаров:',
-    cartModel.getTotal(),
-    '\nЦена тестового товара:',
-    testProduct.price,
-    '\nЦена второго тестового товара:',
-    anotherTestProduct.price
-  );
-
-  console.log(
-    'Оба товара есть в корзине, ожидаем true:',
-  cartModel.hasItem(testProduct.id)
-    && cartModel.hasItem(anotherTestProduct.id)
-  );
-
-  cartModel.addItem(testProduct); // Пробуем добавить тот же товар повторно
-
-  console.log(
-    'Результат после повторного добавления, ожидаем 2:',
-    cartModel.getCount()
-  );
-
-  cartModel.removeItem(anotherTestProduct);   // Удаляем товар
-
-  console.log(
-    'После удаления, ожидаем false:',
-    cartModel.hasItem(anotherTestProduct.id)
-  );
-
-  console.log(
-    'Количество после удаления, ожидаем 1:',
-    cartModel.getCount()
-  );
-
-  // Очищаем корзину полностью
-  cartModel.clear();
-
-  console.log(
-    'Корзина после очистки, ожидаем []:',
-    [...cartModel.getItems()]
-  );
-
-  console.log(
-    'Сумма после очистки корзины, ожидаем 0:',
-    cartModel.getTotal()
-  );
-}
-
-// Пробуем добавить товар без цены, стоит запрет
-const pricelessProduct = apiProducts.items.find(
-  (product) => product.price === null // Находим такой товар
-);
-
-if (pricelessProduct) {
-  cartModel.addItem(pricelessProduct);
-
-  console.log(
-    'Товар без цены не добавлен, ожидаем false:',
-    cartModel.hasItem(pricelessProduct.id)
-  );
-}
-
-// Проверяем покупателя
-console.log('--- Покупатель ---');
-buyerModel.clear(); // Сбрасываем данные в начале
-
-console.log(
-  'Начальные данные покупателя, ожидаем пустые строки:',
-  buyerModel.getData()
-);
-
-console.log(
-  'Ошибки пустой формы, ожидаем 4 ошибки:',
-  buyerModel.validate()
-);
-
-// Имитируем первый этап заполнения формыЖ выбрал оплату и ввел адрес
-
-buyerModel.setData({
-  payment: 'card',
-  address: 'Spb Vosstania 1'
-});
-
-console.log(
-  'Итог после первого этапа:',
-  buyerModel.getData()
-);
-
-console.log(
-  'Проверка после первого этапа, ожидаем ошибки email и телефона:',
-  buyerModel.validate()
-);
-
-// Имитируем второй этап: вводим остальные данные
-
-buyerModel.setData({
-  email: 'test@test.ru',
-  phone: '+7 123 456 78 90'
-});
-
-console.log(
-  'Все данные заполнены, ранее введенные сохранились:',
-  buyerModel.getData()
-);
-
-console.log(
-  'Ошибок нет, ожидаем {}:',
-  buyerModel.validate()
-);
-
-// пробуем сохранить пустую строку (удалить данные)
-buyerModel.setData({
-  email: ''
-});
-
-console.log(
-  'Проверка после очистки email, ожидаем ошибку email:',
-  buyerModel.validate()
-);
-
-// Проверяем строку из пробелов
-buyerModel.setData({
-  email: '   '
-});
-
-console.log(
-  'Пробелы вместо email, ожидаем ошибку email:',
-  buyerModel.validate()
-);
-
-// Сбрасываем все данные
-buyerModel.clear();
-
-console.log(
-  'После очистки ожидаем пустые строки:',
-  buyerModel.getData()
-);
-
-console.log(
-  'После очистки снова ожидаем 4 ошибки:',
-  buyerModel.validate()
-);
-
-// Работы по 8му спринту
-console.log('-- Проверки API для 8го спринта --');
-const api = new Api(API_URL); 
-const apiMethods = new ApiMethods(api);
-
-apiMethods.getProducts() // Запрашиваем товары с сервера
-  .then((response) => {
-      productsModel.setItems(response.items);
-      //Проверки
-      console.log(
-        'Каталог с сервера, сохранённый в модели:',
-        [...productsModel.getItems()]
-      );
-      console.log(
-        'Количество товаров в ответе сервера:',
-        response.total
-      );
-
-      console.log(
-        'Количество товаров в модели:',
-        productsModel.getItems().length
-      );
-      }
-  ).catch((error: unknown) => {
-    console.error('Не удалось загрузить каталог:', error); // Ошибка сервера или сети
+  const cards = products.map((product) => {
+    const container = cloneTemplate<HTMLButtonElement>('#card-catalog');
+    const card = new CardCatalog(container, {
+      onClick: () => {
+        productsModel.setPreview(product);
+      },
+    });
+    return card.render(product);
   });
 
-  // Проверяем шапку
+  gallery.render({
+    catalog: cards,
+  });
 
-  const headerContainer = document.querySelector<HTMLElement>('.header');
-
-if (!headerContainer) {
-  throw new Error('Не найден элемент .header');
-}
-const events = new EventEmitter();
-const header = new Header(headerContainer, events);
-
-events.on('basket:open', () => {
-  console.log('Запрошено открытие корзины');
 });
-
-header.render({ counter: 3 });
-
-console.assert(
-  header.render() === headerContainer,
-  'render() должен возвращать корневой элемент шапки'
-);

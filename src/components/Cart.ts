@@ -1,7 +1,13 @@
 import type { IProduct } from '../types';
+import type { IEvents } from './base/Events'; // подключаем брокер событий из src/components/base/Events.ts
 
 export class Cart {
   protected items: IProduct[] = [];   // Товары, добавленные в корзину
+  protected events: IEvents; // events — события 
+
+  constructor(events: IEvents) {
+    this.events = events;
+  }
 
   getItems(): IProduct[] { // Возвращаем массив товаров корзины
     return this.items;
@@ -18,16 +24,28 @@ export class Cart {
     }
 
     this.items.push(product); // Добавляем товар в конец массива
+    this.events.emit('cart:changed'); // Сообщаем об изменении корзины
   }
 
   removeItem(product: IProduct): void { // Удаляем товар из корзины
+    if (!this.hasItem(product.id)) { // Добавляем проверку, чтобы не уведомлять об удалении отсутствующего товара
+      return;
+    }
+    
     this.items = this.items.filter( // Создаём новый массив фильтруя все товары козины, которые не совпадают с идентификатором удаляемого
       (item) => item.id !== product.id
     );
+
+    this.events.emit('cart:changed'); // Сообщаем об изменении корзины
   }
 
   clear(): void { // Очищаем корзину, заменяя массив пустым
+    if (this.items.length === 0) { // Добавляем проверку, чтобы не уведомлять об очистке пустой корзины
+      return;
+    }
+
     this.items = [];
+    this.events.emit('cart:changed'); // Сообщаем об изменении корзины
   }
 
   getTotal(): number { // Возвращаем сумму товаров в корзине
