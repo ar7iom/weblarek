@@ -1,22 +1,20 @@
 import type { IEvents } from './base/Events'; // подключаем брокер событий из src/components/base/Events.ts
-import type {
-  IBuyer,
-  TPayment,
-  BuyerErrors
-} from '../types';
+import type { IBuyer, TPayment, BuyerErrors } from '../types';
 
-export class Buyer { // Изначально данные пустые
+export class Buyer {
+  // Изначально данные пустые
   protected payment: TPayment = '';
   protected address: string = '';
   protected email: string = '';
   protected phone: string = '';
-  protected events: IEvents; // events — события 
+  protected events: IEvents; // events — события
 
   constructor(events: IEvents) {
     this.events = events;
   }
 
-  setData(data: Partial<IBuyer>): void { // Сохраняем только переданные данные
+  setData(data: Partial<IBuyer>): void {
+    // Сохраняем только переданные данные
 
     if (data.payment !== undefined) {
       this.payment = data.payment;
@@ -37,17 +35,18 @@ export class Buyer { // Изначально данные пустые
     this.events.emit('buyer:update');
   }
 
-  getData(): IBuyer { // Создаём новый объект и кладём туда данные покупателя
+  getData(): IBuyer {
+    // Создаём новый объект и кладём туда данные покупателя
     return {
       payment: this.payment,
       address: this.address,
       email: this.email,
-      phone: this.phone
+      phone: this.phone,
     };
   }
 
-
-  clear(): void { // Сбрасываем данные
+  clear(): void {
+    // Сбрасываем данные
     this.payment = '';
     this.address = '';
     this.email = '';
@@ -56,7 +55,8 @@ export class Buyer { // Изначально данные пустые
     this.events.emit('buyer:update');
   }
 
-  validate(): BuyerErrors { // Валидация данных
+  validate(): BuyerErrors {
+    // Валидация данных
 
     const errors: BuyerErrors = {};
 
@@ -64,7 +64,7 @@ export class Buyer { // Изначально данные пустые
       errors.payment = 'Выберите способ оплаты';
     }
 
-    // Убираем пробелы через trim чтобы строка из одних пробелов считалась незаполненной 
+    // Убираем пробелы через trim чтобы строка из одних пробелов считалась незаполненной
 
     if (this.address.trim() === '') {
       errors.address = 'Укажите адрес';

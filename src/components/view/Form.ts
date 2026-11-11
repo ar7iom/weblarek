@@ -11,14 +11,19 @@ export abstract class Form<T extends FormData> extends Component<T> {
     super(container);
     this.events = events;
 
-    this.submitButton = 
-      container.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    this.submitButton = container.querySelector<HTMLButtonElement>(
+      'button[type="submit"]',
+    )!;
 
-    this.errorsElement = 
-      container.querySelector<HTMLElement>('.form__errors')!;
-    
+    this.errorsElement = container.querySelector<HTMLElement>('.form__errors')!;
+
     container.addEventListener('submit', (event) => {
       event.preventDefault();
+
+      if (this.submitButton.disabled) {
+        return;
+      }
+
       this.onSubmit();
     });
   }

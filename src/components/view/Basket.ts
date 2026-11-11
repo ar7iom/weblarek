@@ -12,21 +12,24 @@ export class Basket extends Component<BasketData> {
     super(container);
     this.events = events;
 
-    this.listElement = 
-      container.querySelector<HTMLElement>('.basket__list')!;
-    
-    this.totalElement = 
-      container.querySelector<HTMLElement>('.basket__price')!;
-    
-    this.orderButton = 
+    this.listElement = container.querySelector<HTMLElement>('.basket__list')!;
+
+    this.totalElement = container.querySelector<HTMLElement>('.basket__price')!;
+
+    this.orderButton =
       container.querySelector<HTMLButtonElement>('.basket__button')!;
-    
+
     this.orderButton.addEventListener('click', () => {
       this.events.emit('order:open');
     });
   }
 
   set list(items: HTMLElement[]) {
+    if (items.length === 0) {
+      this.listElement.textContent = 'Корзина пуста';
+      return;
+    }
+
     this.listElement.replaceChildren(...items);
   }
 

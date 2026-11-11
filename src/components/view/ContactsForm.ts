@@ -9,16 +9,18 @@ export class ContactsForm extends Form<ContactsFormData> {
   constructor(container: HTMLFormElement, events: IEvents) {
     super(container, events);
 
-    this.emailInput =
-      container.querySelector<HTMLInputElement>('input[name="email"]')!;
-    
-    this.phoneInput =
-      container.querySelector<HTMLInputElement>('input[name="phone"]')!;
+    this.emailInput = container.querySelector<HTMLInputElement>(
+      'input[name="email"]',
+    )!;
+
+    this.phoneInput = container.querySelector<HTMLInputElement>(
+      'input[name="phone"]',
+    )!;
 
     this.emailInput.addEventListener('input', () => {
       this.onInputChange('email', this.emailInput.value);
     });
-    
+
     this.phoneInput.addEventListener('input', () => {
       this.onInputChange('phone', this.phoneInput.value);
     });

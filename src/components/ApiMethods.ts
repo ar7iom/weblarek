@@ -1,12 +1,6 @@
-import type {
-  IApi,
-  IProductsResponse,
-  IOrder,
-  IOrderResult
-} from '../types';
+import type { IApi, IProductsResponse, IOrder, IOrderResult } from '../types';
 
 export class ApiMethods {
-
   protected api: IApi;
 
   constructor(api: IApi) {

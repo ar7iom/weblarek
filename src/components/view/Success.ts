@@ -11,11 +11,13 @@ export class Success extends Component<SuccessData> {
     super(container);
     this.events = events;
 
-    this.descriptionElement =
-      container.querySelector<HTMLElement>('.order-success__description')!;
-    
-    this.closeButton =
-      container.querySelector<HTMLButtonElement>('.order-success__close')!;
+    this.descriptionElement = container.querySelector<HTMLElement>(
+      '.order-success__description',
+    )!;
+
+    this.closeButton = container.querySelector<HTMLButtonElement>(
+      '.order-success__close',
+    )!;
 
     this.closeButton.addEventListener('click', () => {
       this.events.emit('success:close');

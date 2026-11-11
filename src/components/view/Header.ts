@@ -13,15 +13,16 @@ export class Header extends Component<HeaderData> {
 
     this.basketButton =
       this.container.querySelector<HTMLButtonElement>('.header__basket')!;
-      
-    this.counterElement =
-      this.container.querySelector<HTMLElement>('.header__basket-counter')!;
+
+    this.counterElement = this.container.querySelector<HTMLElement>(
+      '.header__basket-counter',
+    )!;
 
     this.basketButton.addEventListener('click', () => {
       this.events.emit('basket:open');
     });
   }
-  
+
   set counter(value: number) {
     this.counterElement.textContent = String(value);
   }

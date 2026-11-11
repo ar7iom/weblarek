@@ -8,7 +8,6 @@ export class Gallery extends Component<GalleryData> {
     super(container);
 
     this.catalogElement = container;
-
   }
   set catalog(items: HTMLElement[]) {
     this.catalogElement.replaceChildren(...items);

@@ -4,31 +4,35 @@ import type { IEvents } from './base/Events'; // подключаем броке
 export class Products {
   protected items: IProduct[] = []; // items — массив товаров, изначально пустой
   protected preview: IProduct | null = null; // preview — выбранный товар, изначально отсутствует
-  protected events: IEvents; // events — события 
+  protected events: IEvents; // events — события
 
   constructor(events: IEvents) {
     this.events = events;
   }
 
-  setItems(items: IProduct[]): void { // Сохранение списка
+  setItems(items: IProduct[]): void {
+    // Сохранение списка
     this.items = items;
     this.events.emit('products:update');
   }
 
-  getItems(): IProduct[] { // Получение списка
+  getItems(): IProduct[] {
+    // Получение списка
     return this.items;
   }
 
-  getProduct(id: string): IProduct | undefined { // Поиск товара
+  getProduct(id: string): IProduct | undefined {
+    // Поиск товара
     return this.items.find((item) => item.id === id);
   }
 
-  setPreview(product: IProduct | null): void { // Запоминаем переданный товар. Если передать null, выбор будет сброшен
+  setPreview(product: IProduct | null): void {
+    // Запоминаем переданный товар. Если передать null, выбор будет сброшен
     this.preview = product;
-    this.events.emit('preview:update');
   }
 
-  getPreview(): IProduct | null { // Возвращаем запомненный товар либо null
+  getPreview(): IProduct | null {
+    // Возвращаем запомненный товар либо null
     return this.preview;
   }
 }
