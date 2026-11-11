@@ -25,11 +25,6 @@ export class Basket extends Component<BasketData> {
   }
 
   set list(items: HTMLElement[]) {
-    if (items.length === 0) {
-      this.listElement.textContent = 'Корзина пуста';
-      return;
-    }
-
     this.listElement.replaceChildren(...items);
   }
 
