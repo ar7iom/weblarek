@@ -5,7 +5,7 @@ import { Cart } from './components/Cart';
 import { Buyer } from './components/Buyer';
 import { Api } from './components/base/Api';
 import { ApiMethods } from './components/ApiMethods';
-import { API_URL } from './utils/constants';
+import { API_URL, CDN_URL } from './utils/constants';
 import { EventEmitter } from './components/base/Events';
 import type { IProduct, IBuyer, BuyerErrors, IOrder } from './types';
 
@@ -29,8 +29,6 @@ const events = new EventEmitter();
 const productsModel = new Products(events); // Каталог
 const cartModel = new Cart(events); // Корзина
 const buyerModel = new Buyer(events); // Покупатель
-
-let isOrderSubmitting: boolean = false; // Состояние запроса
 
 const header = new Header(
   document.querySelector<HTMLElement>('.header')!,
@@ -59,13 +57,7 @@ const success = new Success(cloneTemplate<HTMLElement>('#success'), events);
 
 const preview = new CardPreview(cloneTemplate<HTMLElement>('#card-preview'), {
   onClick: () => {
-    const product = productsModel.getPreview();
-
-    if (!product) {
-      return;
-    }
-
-    events.emit('product:toggle', { id: product.id });
+    events.emit('product:toggle');
   },
 });
 
@@ -144,16 +136,10 @@ function updateContactsForm(): void {
 
   const formState = getFormState(errors, ['email', 'phone']);
 
-  let valid = formState.valid;
-
-  if (isOrderSubmitting) {
-    valid = false;
-  }
-
   contactsForm.render({
     email: buyer.email,
     phone: buyer.phone,
-    valid: valid,
+    valid: formState.valid,
     errors: formState.errors,
   });
 }
@@ -183,9 +169,18 @@ events.on('products:update', () => {
   });
 });
 
-// Выбрать товар и показать подробную карточку
+// Выбрать товар
 events.on<IProduct>('product:open', (product) => {
   productsModel.setPreview(product); // Запоминаем выбранный товар
+});
+
+// Показать подробную карточку
+events.on('preview:changed', () => {
+  const product = productsModel.getPreview();
+
+  if (!product) {
+    return;
+  }
 
   const inBasket = cartModel.hasItem(product.id); // Получаем данные для состояния кнопки
   const unavailable = product.price === null || product.price === 0;
@@ -216,41 +211,22 @@ events.on<IProduct>('product:open', (product) => {
 });
 
 // Добавить или удалить товар и обновить кнопку
-events.on<{ id: IProduct['id'] }>('product:toggle', ({ id }) => {
+events.on('product:toggle', () => {
   const product = productsModel.getPreview(); // Получаем товар, открытый в превью
 
   if (!product) {
     return;
   }
 
-  if (product.id !== id) {
-    // Проверяем, что событие относится к открытому товару
-    return;
-  }
-
-  const unavailable = product.price === null || product.price === 0;
-
-  if (unavailable) {
-    return;
-  }
-
+  const id = product.id;
   const inBasket = cartModel.hasItem(id);
-
-  let buttonText: string; // Выбираем лейбл кнопки
 
   if (inBasket) {
     // Меняем содержимое корзины
     cartModel.removeItem(product);
-    buttonText = 'Купить';
   } else {
     cartModel.addItem(product);
-    buttonText = 'Удалить из корзины';
   }
-
-  preview.render({
-    // Обновляем только текст кнопки уже открытого превью
-    buttonText: buttonText,
-  });
 
   modal.close();
 });
@@ -325,7 +301,7 @@ events.on<{ field: keyof IBuyer; value: string }>(
   'buyer:change',
   ({ field, value }) => {
     if (field === 'payment') {
-      if (value === 'card' || value === 'cash' || value === '') {
+      if (value === 'card' || value === 'cash')  {
         buyerModel.setData({
           payment: value,
         });
@@ -346,55 +322,17 @@ events.on('buyer:update', () => {
   updateContactsForm();
 });
 
-// Проверить данные и отправить заказ
+// Отправить заказ
 events.on('contacts:submit', async () => {
-  if (isOrderSubmitting) {
-    return;
-  }
-
   const buyer = buyerModel.getData();
-  const errors = buyerModel.validate();
-
-  if (errors.payment || errors.address) {
-    // Проверяем первый шаг оформления
-    updateOrderForm();
-
-    modal.render({
-      content: orderForm.render(),
-    });
-
-    return;
-  }
-
-  if (errors.email || errors.phone) {
-    // Проверяем контактные данные
-    updateContactsForm();
-    return;
-  }
-
-  if (buyer.payment === '') {
-    // Дополнительная проверка сужает тип оплаты для TypeScript
-    return;
-  }
-
-  const products = cartModel.getItems(); // Пустой заказ отправлять нельзя
-
-  if (products.length === 0) {
-    contactsForm.render({
-      errors: 'Корзина пуста',
-      valid: false,
-    });
-
-    return;
-  }
+  const products = cartModel.getItems();
 
   const items = products.map((product) => {
-    // Нужно отправлять только идентификаторы
     return product.id;
   });
 
   const order: IOrder = {
-    payment: buyer.payment,
+    payment: buyer.payment as IOrder['payment'],
     address: buyer.address,
     email: buyer.email,
     phone: buyer.phone,
@@ -402,14 +340,10 @@ events.on('contacts:submit', async () => {
     total: cartModel.getTotal(),
   };
 
-  isOrderSubmitting = true;
-
   contactsForm.render({
     valid: false,
     errors: '',
   });
-
-  let requestError = '';
 
   try {
     const result = await apiMethods.createOrder(order);
@@ -429,17 +363,11 @@ events.on('contacts:submit', async () => {
   } catch (error: unknown) {
     console.error('Не удалось оформить заказ:', error);
 
-    requestError = 'Не удалось оформить заказ. Попробуйте ещё раз.';
-  } finally {
-    isOrderSubmitting = false;
+    updateContactsForm(); // Восстанавливаем состояние кнопки по актуальным данным
 
-    updateContactsForm();
-
-    if (requestError !== '') {
-      contactsForm.render({
-        errors: requestError,
-      });
-    }
+    contactsForm.render({     // Показываем ошибку после обновления формы, чтобы её не стереть
+      errors: 'Не удалось оформить заказ. Попробуйте ещё раз.',
+    });
   }
 });
 
@@ -456,6 +384,11 @@ const apiMethods = new ApiMethods(api);
 apiMethods
   .getProducts() // Запрашиваем товары с сервера
   .then((response) => {
+    response.items.forEach((item) => {
+      if (item.image) {
+        item.image = `${CDN_URL}${item.image}`;
+      }
+    });
     productsModel.setItems(response.items);
   })
   .catch((error: unknown) => {

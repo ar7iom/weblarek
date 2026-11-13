@@ -29,6 +29,7 @@ export class Products {
   setPreview(product: IProduct | null): void {
     // Запоминаем переданный товар. Если передать null, выбор будет сброшен
     this.preview = product;
+    this.events.emit('preview:changed');
   }
 
   getPreview(): IProduct | null {

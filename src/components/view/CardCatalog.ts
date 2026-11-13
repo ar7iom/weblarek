@@ -1,6 +1,6 @@
 import type { CardCatalogData, CardActions } from '../../types';
 import { Card } from './Card';
-import { CDN_URL, categoryMap } from '../../utils/constants';
+import { categoryMap } from '../../utils/constants';
 
 export class CardCatalog extends Card<CardCatalogData> {
   protected imageElement: HTMLImageElement;
@@ -19,7 +19,7 @@ export class CardCatalog extends Card<CardCatalogData> {
   }
 
   set image(value: string) {
-    this.setImage(this.imageElement, CDN_URL + value);
+    this.setImage(this.imageElement, value);
   }
   set category(value: string) {
     this.categoryElement.textContent = value;
