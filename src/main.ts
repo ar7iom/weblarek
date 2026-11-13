@@ -62,7 +62,7 @@ const preview = new CardPreview(cloneTemplate<HTMLElement>('#card-preview'), {
 });
 
 // ----------------------------
-// ГЛОБАВЛЬНЫЕ ФУНКЦИИ
+// ГЛОБАЛЬНЫЕ ФУНКЦИИ
 // ----------------------------
 
 // Получает товары из Cart, создаёт элементы через CardBasket, передаёт их вместе с суммой и состоянием кнопки в Basket.render()
@@ -150,7 +150,7 @@ function updateContactsForm(): void {
 
 // КАТАЛОГ И ПРЕВЬЮ
 
-// Уведомляет об обновлении каталога товаров
+// Обновить каталог после изменения списка товаров
 events.on('products:update', () => {
   const products = productsModel.getItems();
 
@@ -203,8 +203,7 @@ events.on('preview:changed', () => {
   });
 
   modal.render({
-    // Устанавливаем содержимое модалки и открываем её
-    content: previewElement,
+    content: previewElement, // Устанавливаем содержимое модального окна
   });
 
   modal.open();
@@ -301,7 +300,7 @@ events.on<{ field: keyof IBuyer; value: string }>(
   'buyer:change',
   ({ field, value }) => {
     if (field === 'payment') {
-      if (value === 'card' || value === 'cash')  {
+      if (value === 'card' || value === 'cash') {
         buyerModel.setData({
           payment: value,
         });
@@ -316,7 +315,7 @@ events.on<{ field: keyof IBuyer; value: string }>(
   },
 );
 
-// Уведомляет об обновлении данных покупателя
+// Обновить формы после изменения данных покупателя
 events.on('buyer:update', () => {
   updateOrderForm();
   updateContactsForm();
@@ -365,7 +364,8 @@ events.on('contacts:submit', async () => {
 
     updateContactsForm(); // Восстанавливаем состояние кнопки по актуальным данным
 
-    contactsForm.render({     // Показываем ошибку после обновления формы, чтобы её не стереть
+    contactsForm.render({
+      // Показываем ошибку после обновления формы, чтобы её не стереть
       errors: 'Не удалось оформить заказ. Попробуйте ещё раз.',
     });
   }
@@ -392,5 +392,5 @@ apiMethods
     productsModel.setItems(response.items);
   })
   .catch((error: unknown) => {
-    console.error('Не удалось загрузить каталог:', error); // Ошибка сервера или сети
+    console.error('Не удалось загрузить каталог:', error); // Ошибка сервера, сети и прочие ошибки обработки ответа
   });
